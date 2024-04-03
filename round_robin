@@ -1,0 +1,55 @@
+#include <stdio.h>
+
+#define MAX_PROCESSES 10
+
+
+typedef struct {
+    int id;
+    int burst_time;
+    int remaining_time;
+} Process;
+
+void roundRobin(Process processes[], int n, int quantum) {
+    int remaining_processes = n;
+    int time = 0;
+
+    while (remaining_processes > 0) {
+        for (int i = 0; i < n; i++) {
+            if (processes[i].remaining_time > 0) {
+                if (processes[i].remaining_time <= quantum) {
+                    time += processes[i].remaining_time;
+                    processes[i].remaining_time = 0;
+                    printf("Process %d finished at time %d\n", processes[i].id, time);
+                    remaining_processes--;
+                } else {
+                    time += quantum;
+                    processes[i].remaining_time -= quantum;
+                    printf("Process %d executed for quantum at time %d\n", processes[i].id, time);
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    Process processes[MAX_PROCESSES];
+    int num_processes, quantum;
+
+    printf("Enter  processes: ");
+    scanf("%d", &num_processes);
+
+    printf("Enter quantum time: ");
+    scanf("%d", &quantum);
+
+    printf("Enter burst time for each process:\n");
+    for (int i = 0; i < num_processes; i++) {
+        printf("Process %d: ", i + 1);
+        scanf("%d", &processes[i].burst_time);
+        processes[i].id = i + 1;
+        processes[i].remaining_time = processes[i].burst_time;
+    }
+
+    roundRobin(processes, num_processes, quantum);
+
+    return 0;
+}
