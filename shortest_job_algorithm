@@ -1,0 +1,80 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+struct Process {
+    int id;
+    int burstTime;
+};
+
+bool compare(Process a, Process b) {
+    return a.burstTime < b.burstTime;
+}
+
+void findWaitingTime(vector<Process>& processes, vector<int>& waitingTime) {
+    int n = processes.size();
+    waitingTime[0] = 0;
+
+    for (int i = 1; i < n; i++) {
+        waitingTime[i] = waitingTime[i - 1] + processes[i - 1].burstTime;
+    }
+}
+
+void findTurnaroundTime(vector<Process>& processes, vector<int>& waitingTime, vector<int>& turnaroundTime) {
+    int n = processes.size();
+
+    for (int i = 0; i < n; i++) {
+        turnaroundTime[i] = processes[i].burstTime + waitingTime[i];
+    }
+}
+
+void findAverageTime(vector<Process>& processes) {
+    int n = processes.size();
+    vector<int> waitingTime(n, 0);
+    vector<int> turnaroundTime(n, 0);
+
+    findWaitingTime(processes, waitingTime);
+    findTurnaroundTime(processes, waitingTime, turnaroundTime);
+
+    int totalWaitingTime = 0;
+    int totalTurnaroundTime = 0;
+
+    cout << "Process\tBurst Time\tWaiting Time\tTurnaround Time" << endl;
+
+    for (int i = 0; i < n; i++) {
+        totalWaitingTime += waitingTime[i];
+        totalTurnaroundTime += turnaroundTime[i];
+        cout << processes[i].id << "\t" << processes[i].burstTime << "\t\t"
+             << waitingTime[i] << "\t\t" << turnaroundTime[i] << endl;
+    }
+
+    float averageWaitingTime = (float)totalWaitingTime / n;
+    float averageTurnaroundTime = (float)totalTurnaroundTime / n;
+
+    cout << endl;
+    cout << "Average Waiting Time = " << averageWaitingTime << endl;
+    cout << "Average Turnaround Time = " << averageTurnaroundTime << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    vector<Process> processes(n);
+
+    cout << "Enter burst time for each process:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout << "Process " << i + 1 << ": ";
+        cin >> processes[i].burstTime;
+        processes[i].id = i + 1;
+    }
+
+    sort(processes.begin(), processes.end(), compare);
+
+    findAverageTime(processes);
+
+    return 0;
+}
